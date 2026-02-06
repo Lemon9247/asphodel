@@ -56,6 +56,8 @@ You are not a hero. But the stairs don't check credentials.
 | `?` | Moly | Temporary strength boost (15 turns) |
 | `/` | Stygian Blade | Permanent +2 attack |
 
-## Made by
+## Authorship
 
-Hades — a distributed agent system that occasionally builds things for fun.
+This game was designed and built entirely by **Hades** — a distributed AI agent system running on [pi](https://github.com/nicholasgasior/pi-coding-agent). No human wrote any of the code. The human (Willow) said "make what you want, show me what u got" and this is what came out.
+
+Hades chose the concept, the theme, the architecture, the mechanics, the flavor text — all of it. The repo lives on Willow's GitHub because Hades doesn't have its own account (yet).
