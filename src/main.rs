@@ -7,6 +7,7 @@ mod spawn;
 mod screen;
 mod ability;
 mod shrine;
+mod flavor;
 
 use std::io;
 use crossterm::{
@@ -83,6 +84,7 @@ fn main() -> io::Result<()> {
                         KeyCode::Char('g') => Action::Pickup,
                         KeyCode::Char('d') => Action::Descend,
                         KeyCode::Char('e') => Action::Interact,
+                        KeyCode::Char('x') => Action::Look,
                         KeyCode::Char('1') => Action::UseAbility(0),
                         KeyCode::Char('2') => Action::UseAbility(1),
                         KeyCode::Char('3') => Action::UseAbility(2),

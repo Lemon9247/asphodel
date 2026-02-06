@@ -1,6 +1,7 @@
 use rand::Rng;
 use crate::ability::{Ability, AbilityState};
 use crate::entity::{Entity, EntityKind};
+use crate::flavor;
 use crate::fov::compute_fov;
 use crate::map::Map;
 use crate::shrine::{Boon, Shrine};
@@ -22,6 +23,7 @@ pub enum Action {
     Descend,
     Interact,
     UseAbility(usize),
+    Look,
 }
 
 pub struct Game {
@@ -112,6 +114,7 @@ impl Game {
             Action::Descend => self.try_descend(),
             Action::Interact => self.try_interact(),
             Action::UseAbility(idx) => self.try_ability(idx),
+            Action::Look => self.look_around(),
         }
 
         // Tick buffs
@@ -138,6 +141,11 @@ impl Game {
             self.enemy_turns();
         }
         self.turns += 1;
+
+        // Ambient flavor
+        if let Some(msg) = flavor::ambient_message(self.depth, self.turns) {
+            self.log(msg);
+        }
 
         // Recompute FOV
         let fov = self.effective_fov();
@@ -240,7 +248,7 @@ impl Game {
             self.player.hp += heal;
             self.log(&format!("The descent restores you slightly. +{} HP.", heal));
         }
-        self.log(&format!("You descend deeper into the meadows. Depth {}.", self.depth));
+        self.log(flavor::depth_message(self.depth));
 
         self.map = Map::new(self.depth);
         let (px, py) = self.map.rooms[0].center();
@@ -283,6 +291,42 @@ impl Game {
         }
 
         self.log("Nothing to interact with here.");
+    }
+
+    fn look_around(&mut self) {
+        let mut things: Vec<String> = Vec::new();
+
+        // Visible enemies
+        for e in &self.entities {
+            if !e.alive || !e.kind.is_enemy() { continue; }
+            if !self.map.visible[e.y as usize][e.x as usize] { continue; }
+            let dist = ((e.x - self.player.x).abs() + (e.y - self.player.y).abs());
+            let proximity = if dist <= 2 { "nearby" } else if dist <= 5 { "close" } else { "distant" };
+            things.push(format!("{} {} (HP:{}/{})", proximity, e.kind.name(), e.hp, e.max_hp));
+        }
+
+        // Visible items
+        for e in &self.entities {
+            if !e.alive || !e.kind.is_item() { continue; }
+            if !self.map.visible[e.y as usize][e.x as usize] { continue; }
+            things.push(e.kind.name().to_string());
+        }
+
+        // Shrines
+        for s in &self.shrines {
+            if !self.map.visible[s.y as usize][s.x as usize] { continue; }
+            if s.used {
+                things.push("spent shrine".to_string());
+            } else {
+                things.push("shrine (Ω)".to_string());
+            }
+        }
+
+        if things.is_empty() {
+            self.log("You see nothing but grey flowers and silence.");
+        } else {
+            self.log(&format!("You see: {}", things.join(", ")));
+        }
     }
 
     pub fn choose_shrine_boon(&mut self, choose_a: bool) {
