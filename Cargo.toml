@@ -1,0 +1,10 @@
+[package]
+name = "asphodel"
+version = "0.1.0"
+edition = "2021"
+description = "A terminal roguelike set in the Greek underworld. You are a shade. You will not last."
+
+[dependencies]
+ratatui = "0.29"
+crossterm = "0.28"
+rand = "0.8"
