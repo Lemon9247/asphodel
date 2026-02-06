@@ -187,6 +187,11 @@ impl Game {
         }
 
         self.depth += 1;
+        let heal = 5.min(self.player.max_hp - self.player.hp);
+        if heal > 0 {
+            self.player.hp += heal;
+            self.log(&format!("The descent restores you slightly. +{} HP.", heal));
+        }
         self.log(&format!("You descend deeper into the meadows. Depth {}.", self.depth));
 
         self.map = Map::new(self.depth);

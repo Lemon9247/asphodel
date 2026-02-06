@@ -86,8 +86,8 @@ impl Entity {
         Entity {
             x, y,
             kind: EntityKind::Player,
-            hp: 30, max_hp: 30,
-            attack: 5, defense: 2,
+            hp: 40, max_hp: 40,
+            attack: 5, defense: 3,
             alive: true,
             strength_turns: 0,
         }

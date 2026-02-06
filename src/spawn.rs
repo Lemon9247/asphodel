@@ -7,8 +7,13 @@ pub fn populate_room(room: &Rect, depth: u32, entities: &mut Vec<Entity>, map: &
     let mut rng = rand::thread_rng();
 
     // Enemies: more and harder as depth increases
-    let max_enemies = (depth as usize / 2) + 2;
-    let num_enemies = rng.gen_range(0..=max_enemies.min(4));
+    let max_enemies = match depth {
+        1 => 1,
+        2 => 2,
+        3..=4 => 3,
+        _ => 4,
+    };
+    let num_enemies = rng.gen_range(0..=max_enemies);
 
     for _ in 0..num_enemies {
         let x = rng.gen_range(room.x1 as i32..room.x2 as i32);
@@ -26,8 +31,9 @@ pub fn populate_room(room: &Rect, depth: u32, entities: &mut Vec<Entity>, map: &
         entities.push(Entity::enemy(x, y, kind, depth));
     }
 
-    // Items: rarer
-    let num_items = if rng.gen_ratio(1, 3) { 1 } else { 0 };
+    // Items: more generous early, still present later
+    let num_items = if depth <= 2 { if rng.gen_ratio(1, 2) { 1 } else { 0 } }
+        else { if rng.gen_ratio(1, 3) { 1 } else { 0 } };
     for _ in 0..num_items {
         let x = rng.gen_range(room.x1 as i32..room.x2 as i32);
         let y = rng.gen_range(room.y1 as i32..room.y2 as i32);
